@@ -135,8 +135,8 @@ contract TwabControllerHandler is CommonBase, StdCheats, StdUtils {
       }
 
       // Delegate to the new actor
-      vm.prank(currentActor);
-      twabController.delegate(currentVault, newDelegate);
+      vm.prank(currentVault);
+      twabController.delegate(currentActor, newDelegate);
     }
   }
 

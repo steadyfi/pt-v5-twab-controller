@@ -517,12 +517,12 @@ contract TwabController {
 
   /**
    * @notice Sets a delegate for a user which forwards the delegateBalance tied to the user's
-   *          balance to the delegate's delegateBalance.
-   * @param _vault The vault for which the delegate is being set
-   * @param _to the address to delegate to
+   *          balance to the delegate's delegateBalance. Only callable by vault
+   * @param _from The address who is delegating their balance
+   * @param _to The address to delegate to
    */
-  function delegate(address _vault, address _to) external {
-    _delegate(_vault, msg.sender, _to);
+  function delegate(address _from, address _to) external {
+    _delegate(msg.sender, _from, _to);
   }
 
   /**

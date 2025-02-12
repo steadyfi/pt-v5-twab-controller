@@ -555,8 +555,7 @@ contract TwabControllerTest is BaseTest {
     assertEq(twabController.totalSupply(mockVault), _amount);
     assertEq(twabController.totalSupplyDelegateBalance(mockVault), 0);
 
-    changePrank(alice);
-    twabController.delegate(mockVault, bob);
+    twabController.delegate(alice, bob);
 
     assertEq(twabController.balanceOf(mockVault, alice), _amount);
     assertEq(twabController.delegateBalanceOf(mockVault, alice), 0);
@@ -587,9 +586,7 @@ contract TwabControllerTest is BaseTest {
     assertEq(twabController.delegateBalanceOf(mockVault, SPONSORSHIP_ADDRESS), 0);
 
     twabController.sponsor(bob);
-    vm.stopPrank();
-    vm.prank(alice);
-    twabController.delegate(mockVault, bob);
+    twabController.delegate(alice, bob);
 
     // Balances stay the same
     assertEq(twabController.balanceOf(mockVault, alice), _amount);
@@ -841,8 +838,7 @@ contract TwabControllerTest is BaseTest {
     assertEq(twabController.balanceOf(mockVault, alice), _amount);
     assertEq(twabController.delegateBalanceOf(mockVault, alice), _amount);
 
-    changePrank(alice);
-    twabController.delegate(mockVault, bob);
+    twabController.delegate(alice, bob);
 
     assertEq(twabController.balanceOf(mockVault, alice), _amount);
     assertEq(twabController.delegateBalanceOf(mockVault, alice), 0);
@@ -887,8 +883,7 @@ contract TwabControllerTest is BaseTest {
     assertEq(twabController.delegateBalanceOf(mockVault, charlie), 0);
     assertEq(twabController.balanceOf(mockVault, charlie), 0);
 
-    changePrank(alice);
-    twabController.delegate(mockVault, bob);
+    twabController.delegate(alice, bob);
 
     assertEq(twabController.delegateOf(mockVault, alice), bob);
     assertEq(twabController.balanceOf(mockVault, alice), _amount);
@@ -900,7 +895,7 @@ contract TwabControllerTest is BaseTest {
     assertEq(twabController.balanceOf(mockVault, charlie), 0);
     assertEq(twabController.delegateBalanceOf(mockVault, charlie), 0);
 
-    twabController.delegate(mockVault, charlie);
+    twabController.delegate(alice, charlie);
 
     assertEq(twabController.delegateOf(mockVault, alice), charlie);
     assertEq(twabController.balanceOf(mockVault, alice), _amount);
@@ -937,15 +932,15 @@ contract TwabControllerTest is BaseTest {
   }
 
   function testDelegateOf_addressZero() public {
-    vm.startPrank(alice);
-    twabController.delegate(mockVault, address(0));
+    vm.startPrank(mockVault);
+    twabController.delegate(alice, address(0));
     assertEq(twabController.delegateOf(mockVault, alice), SPONSORSHIP_ADDRESS);
   }
 
   function testDelegateOf_address() public {
     address bob = makeAddr("bob");
-    vm.startPrank(alice);
-    twabController.delegate(mockVault, bob);
+    vm.startPrank(mockVault);
+    twabController.delegate(alice, bob);
     assertEq(twabController.delegateOf(mockVault, alice), bob);
   }
 
@@ -992,12 +987,11 @@ contract TwabControllerTest is BaseTest {
   function testDelegate_interpretBurnAddressAsSponsorship() external {
     uint96 _amount = 1000e18;
     twabController.mint(alice, _amount);
-    vm.startPrank(alice);
-    twabController.delegate(address(this), address(0));
+    twabController.delegate(alice, address(0));
     assertEq(twabController.totalSupplyDelegateBalance(address(this)), 0);
     assertEq(twabController.delegateBalanceOf(address(this), bob), 0);
     assertEq(twabController.delegateBalanceOf(address(this), alice), 0);
-    twabController.delegate(address(this), bob);
+    twabController.delegate(alice, bob);
     assertEq(twabController.totalSupplyDelegateBalance(address(this)), _amount);
     assertEq(twabController.delegateBalanceOf(address(this), bob), _amount);
     assertEq(twabController.delegateBalanceOf(address(this), alice), 0);
@@ -1027,10 +1021,9 @@ contract TwabControllerTest is BaseTest {
   }
 
   function testDelegateAlreadySet() external {
-    vm.startPrank(alice);
 
     vm.expectRevert(abi.encodeWithSelector(SameDelegateAlreadySet.selector, alice));
-    twabController.delegate(mockVault, alice);
+    twabController.delegate(alice, alice);
 
     vm.stopPrank();
   }
